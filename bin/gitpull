@@ -1,1 +1,28 @@
-cd /home/www/casted3d.com; git pull
+#!/bin/bash
+DATE=`date`
+ROOT=/home/www
+LOG="$ROOT/logs/gitpull.log"
+PID=""
+
+skipsites=""
+
+sites="
+login.alex2006hw.com
+file.alex2006hw.com
+code.alex2006hw.com
+live.alex2006hw.com
+www.zergut2012.com
+"
+
+echo "Starting gitpull" > $LOG
+for dir  in $sites; do
+  app="$ROOT/$dir"
+  (( echo "checking $app..." ) && [ -d "$app" ] && ( cd $app; echo "gitpull $app"; git pull )) >> $LOG  &
+done
+
+echo "Starting forever check..." > $LOG
+for dirs in $sites; do
+  PID=$(ps -ef |grep $app | grep forever | awk '{ print $2 }')
+  app="$ROOT/$dirs"
+  ( (echo "checking $app...") && [ "$PID" == "" ] && [ -d "$app" ] && ( cd $app; echo "runme $app"; ./runme )) >> $LOG  &
+done
